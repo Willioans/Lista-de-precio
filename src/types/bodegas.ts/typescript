@@ -1,0 +1,14 @@
+export interface Producto {
+  id?: string;
+  nombre: string;     // Ejemplo: "Harina Pan 1kg"
+  costoUSD: number;   // Precio de compra
+  margen: number;     // Ejemplo: 1.20 (20% de ganancia)
+  stock: number;
+}
+
+export interface Bodega {
+  uid: string;        // ID único de Firebase Auth
+  nombreNegocio: string;
+  tasaCambio: number; // Tasa del día (BCV/Paralelo)
+  monedaPrincipal: 'USD' | 'VES';
+}
