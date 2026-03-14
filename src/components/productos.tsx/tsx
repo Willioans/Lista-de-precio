@@ -1,1 +1,35 @@
+import React, { useState } from 'react';
 
+export const FormularioProducto = ({ onAgregar }: { onAgregar: any }) => {
+  const [nombre, setNombre] = useState('');
+  const [costo, setCosto] = useState(0);
+
+  const enviar = (e: React.FormEvent) => {
+    e.preventDefault();
+    onAgregar({ nombre, costoUSD: costo, margen: 1.20, stock: 10 }); // 20% margen por defecto
+    setNombre('');
+    setCosto(0);
+  };
+
+  return (
+    <form onSubmit={enviar} className="mb-8 p-4 bg-gray-50 rounded no-print">
+      <h3 className="font-bold mb-2">Agregar Producto a la Lista</h3>
+      <div className="flex gap-2">
+        <input 
+          placeholder="Nombre del producto" 
+          value={nombre} 
+          onChange={(e) => setNombre(e.target.value)}
+          className="border p-2 flex-1"
+        />
+        <input 
+          type="number" 
+          placeholder="Costo $" 
+          value={costo} 
+          onChange={(e) => setCosto(parseFloat(e.target.value))}
+          className="border p-2 w-24"
+        />
+        <button className="bg-green-600 text-white px-4 py-2 rounded">Añadir</button>
+      </div>
+    </form>
+  );
+};
