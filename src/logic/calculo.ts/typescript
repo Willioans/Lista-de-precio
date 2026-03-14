@@ -1,0 +1,17 @@
+import { Producto } from '../types/bodega';
+
+export const procesarListaParaBodega = (productos: Producto[], tasa: number) => {
+  return productos
+    .sort((a, b) => a.nombre.localeCompare(b.nombre)) // Orden Alfabético Automático
+    .map(p => {
+      const precioVentaUSD = p.costoUSD * p.margen;
+      const precioVentaVES = precioVentaUSD * tasa;
+
+      return {
+        ...p,
+        precioVentaUSD: precioVentaUSD.toFixed(2),
+        precioVentaVES: precioVentaVES.toFixed(2),
+        totalInventarioVES: (precioVentaVES * p.stock).toFixed(2)
+      };
+    });
+};
