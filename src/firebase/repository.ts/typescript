@@ -1,0 +1,11 @@
+import { db } from './config';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+
+export const getProductosPorBodega = async (bodegaUid: string) => {
+  // Solo consultamos los productos que pertenecen a ESTE ID de bodega
+  const productosRef = collection(db, 'productos');
+  const q = query(productosRef, where("bodegaId", "==", bodegaUid));
+  
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
