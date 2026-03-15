@@ -1,77 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { procesarListaParaBodega } from './logic/calculos';
-import { Producto } from './types/bodega';
 
-const App = () => {
-  const [tasa, setTasa] = useState(36.50);
-  const [productos, setProductos] = useState<Producto[]>([]);
-  const [carrito, setCarrito] = useState<any[]>([]);
 
-  // La magia del Senior: Lista procesada y ordenada automáticamente
-  const listaOrdenada = procesarListaParaBodega(productos, tasa);
+import { exportarListaAExcel } from './utils/excel';
 
-  const agregarAlTicket = (prod: any) => {
-    setCarrito([...carrito, prod]);
-  };
+// ... dentro de tu componente App ...
 
-  return (
-    <div className="p-6 max-w-4xl mx-auto font-sans">
-      <header className="flex justify-between items-center mb-8 border-b pb-4">
-        <h1 className="text-2xl font-bold text-blue-700">H&I Lista de Precio</h1>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">Tasa BCV (Bs):</label>
-          <input 
-            type="number" 
-            value={tasa} 
-            onChange={(e) => setTasa(parseFloat(e.target.value))}
-            className="border p-2 rounded w-24 text-center bg-yellow-50"
-          />
-        </div>
-      </header>
+const manejarExportacion = () => {
+  // Preparamos los datos exactamente como los quiere el bodeguero en Excel
+  const datosExcel = listaOrdenada.map(p => ({
+    "Producto": p.nombre,
+    "Stock": p.stock,
+    "Precio ($)": p.precioVentaUSD,
+    "Precio (Bs)": p.precioVentaVES
+  }));
 
-      <section>
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-3 border">Producto (A-Z)</th>
-              <th className="p-3 border">Stock</th>
-              <th className="p-3 border">Precio ($)</th>
-              <th className="p-3 border">Precio (Bs)</th>
-              <th className="p-3 border">Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            {listaOrdenada.map((p, index) => (
-              <tr key={index} className="hover:bg-blue-50">
-                <td className="p-3 border font-medium">{p.nombre}</td>
-                <td className="p-3 border">{p.stock}</td>
-                <td className="p-3 border text-green-700">${p.precioVentaUSD}</td>
-                <td className="p-3 border font-bold">Bs. {p.precioVentaVES}</td>
-                <td className="p-3 border">
-                  <button 
-                    onClick={() => agregarAlTicket(p)}
-                    className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                  >
-                    + Facturar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
-
-      {/* Mini Ticket Flotante */}
-      {carrito.length > 0 && (
-        <div className="fixed bottom-5 right-5 bg-white shadow-2xl p-4 border-2 border-blue-600 rounded-lg w-64">
-          <h3 className="font-bold border-b mb-2">Ticket Actual</h3>
-          <p className="text-sm">Items: {carrito.length}</p>
-          <p className="text-lg font-bold">Total: Bs. {(carrito.reduce((acc, item) => acc + parseFloat(item.precioVentaVES), 0)).toFixed(2)}</p>
-          <button className="w-full bg-green-600 text-white mt-2 py-2 rounded">Imprimir Factura</button>
-        </div>
-      )}
-    </div>
-  );
+  exportarListaAExcel(datosExcel, "Mi Bodega");
 };
 
-export default App;
+// En tu JSX:
+<button 
+  onClick={manejarExportacion}
+  className="bg-green-700 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-800 transition no-print"
+>
+  📊 Descargar Excel
+</button>
