@@ -1,0 +1,13 @@
+import * as XLSX from 'xlsx';
+
+export const exportarListaAExcel = (datosParaExportar: any[], nombreBodega: string) => {
+  // 1. Creamos la hoja de trabajo con los datos procesados
+  const hoja = XLSX.utils.json_to_sheet(datosParaExportar);
+
+  // 2. Creamos el libro de trabajo (Libro de Excel)
+  const libro = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(libro, hoja, "Precios");
+
+  // 3. Generamos el archivo y lo descargamos automáticamente
+  XLSX.writeFile(libro, `Lista_Precios_${nombreBodega.replace(/\s/g, '_')}.xlsx`);
+};
