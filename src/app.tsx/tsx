@@ -1,25 +1,72 @@
+import React, { useState } from 'react';
+import { exportarListaAExcel } from './utils/excel'; // Asegúrate que la ruta sea correcta
+import { procesarListaParaBodega } from './logic/calculos';
+import { Producto } from './types/bodega';
 
+const App = () => {
+  const [tasa, setTasa] = useState(36.50);
+  const [productos, setProductos] = useState<Producto[]>([
+    { nombre: "Harina Pan", costoUSD: 1, margen: 1.15, stock: 50 },
+    { nombre: "Arroz Primor", costoUSD: 0.90, margen: 1.20, stock: 30 }
+  ]);
 
-import { exportarListaAExcel } from './utils/excel';
+  // Lógica de procesamiento
+  const listaOrdenada = procesarListaParaBodega(productos, tasa);
 
-// ... dentro de tu componente App ...
+  // Función de Exportación corregida
+  const manejarExportacion = () => {
+    const datosExcel = listaOrdenada.map(p => ({
+      "Producto": p.nombre,
+      "Stock": p.stock,
+      "Precio ($)": p.precioVentaUSD,
+      "Precio (Bs)": p.precioVentaVES
+    }));
 
-const manejarExportacion = () => {
-  // Preparamos los datos exactamente como los quiere el bodeguero en Excel
-  const datosExcel = listaOrdenada.map(p => ({
-    "Producto": p.nombre,
-    "Stock": p.stock,
-    "Precio ($)": p.precioVentaUSD,
-    "Precio (Bs)": p.precioVentaVES
-  }));
+    exportarListaAExcel(datosExcel, "Mi Bodega");
+  };
 
-  exportarListaAExcel(datosExcel, "Mi Bodega");
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">H&I Lista de Precio</h1>
+      
+      <div className="mb-4 flex gap-4 items-center">
+        <label>Tasa del día:</label>
+        <input 
+          type="number" 
+          value={tasa} 
+          onChange={(e) => setTasa(parseFloat(e.target.value))}
+          className="border p-1 rounded w-24"
+        />
+        
+        {/* BOTÓN DE EXCEL */}
+        <button 
+          onClick={manejarExportacion}
+          className="bg-green-700 text-white px-4 py-2 rounded font-bold hover:bg-green-800"
+        >
+          📊 Descargar Excel
+        </button>
+      </div>
+
+      <table className="w-full border">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border p-2">Producto</th>
+            <th className="border p-2">Precio ($)</th>
+            <th className="border p-2">Precio (Bs)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {listaOrdenada.map((p, i) => (
+            <tr key={i}>
+              <td className="border p-2">{p.nombre}</td>
+              <td className="border p-2">${p.precioVentaUSD}</td>
+              <td className="border p-2">Bs. {p.precioVentaVES}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 };
 
-// En tu JSX:
-<button 
-  onClick={manejarExportacion}
-  className="bg-green-700 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-800 transition no-print"
->
-  📊 Descargar Excel
-</button>
+export default App;
